@@ -1,0 +1,10 @@
+#+title: Index
+
+* TODOS
+** TODO Skapa webbsida för att interagera med en publik server
+** TODO Hantera eventsets
+** TODO Normalisera platsdata
+** TODO Skitbra test suite och felhantering
+** TODO Ta bort ~| Facebook~ från vissa titlar
+** TODO Ersätt escape sequences med unicode
+** TODO Bildproxy service

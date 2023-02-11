@@ -1,0 +1,4 @@
+__pycache__
+memoized
+geckodriver.log
+.direnv/
