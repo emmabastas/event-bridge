@@ -12,6 +12,10 @@
             packages = with pkgs; [
               (python3.withPackages (ps: with ps; [
                 selenium
+
+                # for the server
+                flask
+                gunicorn
               ]))
               chromium
               chromedriver
