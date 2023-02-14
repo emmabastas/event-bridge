@@ -11,8 +11,6 @@
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               (python3.withPackages (ps: with ps; [
-                requests
-                beautifulsoup4
                 selenium
               ]))
               chromium
