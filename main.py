@@ -3,14 +3,13 @@ import sys
 import pprint
 import facebook
 import util
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 
 
 def main():
-    ff_options = Options()
-    ff_options.add_argument("-headless")
-    driver = util.lazy_firefox_web_driver(options=ff_options)
+    options = Options()
+    options.add_argument("-headless")
+    driver = util.lazy_chrome_web_driver(options=options)
     d = facebook.events_for_profile(driver, sys.argv[1])
     driver.quit()
 

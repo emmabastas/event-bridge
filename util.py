@@ -57,9 +57,9 @@ class LazyInstantiateProxy(Generic[C]):
         return self.__proxied_instance.__getattribute__(attr)
 
 
-class LazyFirefoxWebDriver(LazyInstantiateProxy[webdriver.Firefox]):
+class LazyChromeWebDriver(LazyInstantiateProxy[webdriver.Chrome]):
     def __init__(self, *args, **kwargs):
-        super().__init__(webdriver.Firefox, *args, **kwargs)
+        super().__init__(webdriver.Chrome, *args, **kwargs)
 
     def __getattr__(self, attr):
         if attr == "quit" and super().__getattr__("__proxied_instance") is None:
@@ -67,6 +67,5 @@ class LazyFirefoxWebDriver(LazyInstantiateProxy[webdriver.Firefox]):
         return super().__getattr__(attr)
 
 
-
-def lazy_firefox_web_driver(*args, **kwargs) -> webdriver.Firefox:
-    return LazyFirefoxWebDriver(*args, **kwargs) # type: ignore
+def lazy_chrome_web_driver(*args, **kwargs) -> webdriver.Chrome:
+    return LazyChromeWebDriver(*args, **kwargs) # type: ignore

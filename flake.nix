@@ -15,8 +15,8 @@
                 beautifulsoup4
                 selenium
               ]))
-              firefox
-              geckodriver
+              chromium
+              chromedriver
             ];
           };
         }
