@@ -1,4 +1,5 @@
 from typing import Type, TypeVar, Callable, Generic
+import os
 import json
 from selenium import webdriver
 
@@ -17,6 +18,7 @@ def memoize_(name: str, f: Callable[[X], Y], x: X) -> Y:
             return json.load(h)
     except FileNotFoundError:
         y = f(x)
+        os.makedirs("./memoized", exist_ok=True)
         with open(f"./memoized/{name}::{x}", "w") as h:
             json.dump(y, h)
         return y
