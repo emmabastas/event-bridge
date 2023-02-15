@@ -49,11 +49,11 @@ def profile_events(profile_name: str) -> List[facebook.GenericEvent]:
             "fb_page_event",
             util.curry(facebook.fetch_page__event)(d)
         )(id)
-        events.append(facebook.extract_event_details(event_page))
+        event_details = facebook.extract_event_details(event_page)
+        generic_event = facebook.parse_event_details(event_details)
+        events.append(generic_event)
 
-    generic_events = [facebook.parse_event_details(e) for e in events]
-
-    return generic_events
+    return events
 
 
 def get_webdriver() -> WebDriver:
