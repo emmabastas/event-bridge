@@ -55,10 +55,14 @@ def fetch_page__events_for_profile(d: WebDriver, profile: str) -> FetchedFbPageE
 
     prerender = d.page_source
 
-    cockiebutton = WebDriverWait(d, timeout=3).until(
-        lambda d: d.find_element(By.CSS_SELECTOR, '[aria-label="Only allow essential cookies"]')
-    )
-    cockiebutton.click()
+    try:
+        cockiebutton = WebDriverWait(d, timeout=3).until(
+            lambda d: d.find_element(By.CSS_SELECTOR, '[aria-label="Only allow essential cookies"]')
+        )
+        cockiebutton.click()
+    except TimeoutError:
+        pass
+
     d.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(5)
     laterender = d.execute_script("return document.body.innerHTML;")
