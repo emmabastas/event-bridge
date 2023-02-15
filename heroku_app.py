@@ -1,8 +1,10 @@
 from typing import *
 import os
-from flask import Flask
+import json
+from flask import Flask, Response, stream_with_context
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
 import facebook
 import util
 
@@ -32,7 +34,17 @@ def event(event_id: int) -> facebook.GenericEvent:
 
 
 @app.route("/profile/<profile_name>/events", methods=["GET"])
-def profile_events(profile_name: str) -> List[facebook.GenericEvent]:
+def profile_events(profile_name: str):
+
+    return Response(
+        stream_with_context(profile_events_generator(profile_name)),
+        mimetype="application/json",
+    )
+
+
+def profile_events_generator(profile_name: str):
+
+    yield "["
 
     d = get_webdriver()
 
@@ -43,7 +55,11 @@ def profile_events(profile_name: str) -> List[facebook.GenericEvent]:
 
     ids = facebook.extract_event_ids(postrender)
 
-    events = []
+    yield json.dumps({
+        "type": "ids",
+        "value": ids,
+    })
+
     for id in ids:
         event_page = util.memoize(
             "fb_page_event",
@@ -51,9 +67,14 @@ def profile_events(profile_name: str) -> List[facebook.GenericEvent]:
         )(id)
         event_details = facebook.extract_event_details(event_page)
         generic_event = facebook.parse_event_details(event_details)
-        events.append(generic_event)
 
-    return events
+        yield ","
+        yield json.dumps({
+            "type": "event",
+            "value": generic_event
+        })
+
+    yield "]"
 
 
 def get_webdriver() -> WebDriver:
