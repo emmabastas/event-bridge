@@ -1,7 +1,8 @@
 from typing import *
 import os
 import json
-from flask import Flask, Response, stream_with_context
+from flask import Flask, stream_with_context
+from flask.wrappers import Response
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
@@ -38,14 +39,11 @@ def profile_events(profile_name: str):
 
     return Response(
         stream_with_context(profile_events_generator(profile_name)),
-        mimetype="application/json",
+        mimetype="text/plain",
     )
 
 
 def profile_events_generator(profile_name: str):
-
-    yield "["
-
     d = get_webdriver()
 
     _, postrender = util.memoize(
@@ -68,13 +66,10 @@ def profile_events_generator(profile_name: str):
         event_details = facebook.extract_event_details(event_page)
         generic_event = facebook.parse_event_details(event_details)
 
-        yield ","
         yield json.dumps({
             "type": "event",
             "value": generic_event
         })
-
-    yield "]"
 
 
 def get_webdriver() -> WebDriver:
