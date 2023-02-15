@@ -123,10 +123,14 @@ def fetch_page__event(d: WebDriver, event_id: str) -> FetchedFbPageEvent:
     source = d.page_source
     title = d.title
 
-    cover_image = WebDriverWait(d, timeout=10).until(
-        lambda d: d.find_element(By.CSS_SELECTOR, '[data-imgperflogname="profileCoverPhoto"]')
-    )
-    cover_image_url = d.execute_script("return arguments[0].getAttribute('src')", cover_image)
+    cover_image_url = None
+    try:
+        cover_image = WebDriverWait(d, timeout=3).until(
+            lambda d: d.find_element(By.CSS_SELECTOR, '[data-imgperflogname="profileCoverPhoto"]')
+        )
+        cover_image_url = d.execute_script("return arguments[0].getAttribute('src')", cover_image)
+    except TimeoutError:
+        pass
 
     return {
         "id": event_id,
