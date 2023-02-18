@@ -2,3 +2,8 @@ __pycache__
 memoized
 geckodriver.log
 .direnv/
+
+# for frontend
+node_modules/
+.parcel-cache/
+dist/

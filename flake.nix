@@ -19,6 +19,10 @@
               ]))
               chromium
               chromedriver
+
+              # for the frontend
+              nodejs
+              nodePackages.typescript-language-server
             ];
           };
         }

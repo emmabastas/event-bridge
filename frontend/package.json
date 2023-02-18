@@ -1,0 +1,18 @@
+{
+  "browserlist": "default",
+  "scripts": {
+    "start": "parcel index.html"
+  },
+  "devDependencies": {
+    "@codemirror/autocomplete": "^6.4.1",
+    "@codemirror/commands": "^6.2.1",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/language": "^6.6.0",
+    "@codemirror/lint": "^6.1.1",
+    "@codemirror/search": "^6.2.3",
+    "@codemirror/state": "^6.2.0",
+    "@codemirror/view": "^6.9.0",
+    "parcel": "^2.8.3",
+    "process": "^0.11.10"
+  }
+}
