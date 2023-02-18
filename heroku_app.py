@@ -2,6 +2,7 @@ from typing import *
 import os
 import json
 from flask import Flask, stream_with_context
+from flask.helpers import make_response
 from flask.wrappers import Response
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -19,7 +20,7 @@ def hello_world():
 
 
 @app.route("/event/<int:event_id>", methods=["GET"])
-def event(event_id: int) -> facebook.GenericEvent:
+def event(event_id: int):
 
     d = get_webdriver()
 
@@ -31,16 +32,22 @@ def event(event_id: int) -> facebook.GenericEvent:
     event_details = facebook.extract_event_details(event_page)
     generic_event = facebook.parse_event_details(event_details)
 
-    return generic_event
+    response = make_response(generic_event)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+
+    return response
 
 
 @app.route("/profile/<profile_name>/events", methods=["GET"])
 def profile_events(profile_name: str):
+    response = make_response(
+        stream_with_context(
+            profile_events_generator(profile_name)))
 
-    return Response(
-        stream_with_context(profile_events_generator(profile_name)),
-        mimetype="text/plain",
-    )
+    response.headers["Content-Type"] = "text/plain"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+
+    return response
 
 
 def profile_events_generator(profile_name: str):
@@ -53,10 +60,8 @@ def profile_events_generator(profile_name: str):
 
     ids = facebook.extract_event_ids(postrender)
 
-    yield json.dumps({
-        "type": "ids",
-        "value": ids,
-    })
+    yield json.dumps(ids)
+    yield "\n"
 
     for id in ids:
         event_page = util.memoize(
@@ -66,10 +71,8 @@ def profile_events_generator(profile_name: str):
         event_details = facebook.extract_event_details(event_page)
         generic_event = facebook.parse_event_details(event_details)
 
-        yield json.dumps({
-            "type": "event",
-            "value": generic_event
-        })
+        yield json.dumps(generic_event)
+        yield "\n"
 
 
 def get_webdriver() -> WebDriver:
