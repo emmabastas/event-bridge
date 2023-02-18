@@ -4,6 +4,7 @@ import time
 import json
 import re
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -60,7 +61,10 @@ def fetch_page__events_for_profile(d: WebDriver, profile: str) -> FetchedFbPageE
             lambda d: d.find_element(By.CSS_SELECTOR, '[aria-label="Only allow essential cookies"]')
         )
         cockiebutton.click()
-    except TimeoutError:
+    except TimeoutException:
+        print("title is: ", d.title)
+        if d.title in ["Facebook", "Page Not Found | Facebook"]:
+            raise ProfileNotFoundError()
         pass
 
     d.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -71,6 +75,11 @@ def fetch_page__events_for_profile(d: WebDriver, profile: str) -> FetchedFbPageE
         EventsForProfileHtml(prerender),
         EventsForProfileHtmlAfterRender(laterender)
     )
+
+
+class ProfileNotFoundError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 def extract_partial_events(prerender: EventsForProfileHtml) -> List[Dict[str, Any]]:
@@ -129,7 +138,7 @@ def fetch_page__event(d: WebDriver, event_id: str) -> FetchedFbPageEvent:
             lambda d: d.find_element(By.CSS_SELECTOR, '[data-imgperflogname="profileCoverPhoto"]')
         )
         cover_image_url = d.execute_script("return arguments[0].getAttribute('src')", cover_image)
-    except TimeoutError:
+    except TimeoutException:
         pass
 
     return {

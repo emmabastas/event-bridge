@@ -40,9 +40,22 @@ def event(event_id: int):
 
 @app.route("/profile/<profile_name>/events", methods=["GET"])
 def profile_events(profile_name: str):
+    try:
+        d = get_webdriver()
+
+        _, postrender = util.memoize(
+            "fb_page_events_for_profile",
+            util.curry(facebook.fetch_page__events_for_profile)(d)
+        )(profile_name)
+
+    except facebook.ProfileNotFoundError:
+        return make_response("Profile not found", 404)
+
+    ids = facebook.extract_event_ids(postrender)
+
     response = make_response(
         stream_with_context(
-            profile_events_generator(profile_name)))
+            profile_events_generator(ids)))
 
     response.headers["Content-Type"] = "text/plain"
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -50,15 +63,8 @@ def profile_events(profile_name: str):
     return response
 
 
-def profile_events_generator(profile_name: str):
+def profile_events_generator(ids: List[str]):
     d = get_webdriver()
-
-    _, postrender = util.memoize(
-        "fb_page_events_for_profile",
-        util.curry(facebook.fetch_page__events_for_profile)(d)
-    )(profile_name)
-
-    ids = facebook.extract_event_ids(postrender)
 
     yield json.dumps(ids)
     yield "\n"
