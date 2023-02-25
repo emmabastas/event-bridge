@@ -22,11 +22,28 @@ let events: any[] = []
 
 async function main(): Promise<void> {
 
-    let resource = window.location.hash.substring(1)
+    // @ts-ignore
+    let params = (new URL(document.location)).searchParams
 
-    if (resource == "") {
-        statusField.innerHTML = `Need a url fragment!`
+    let resource = params.get("profile")
+
+    if (resource == null) {
+        statusField.innerHTML = `Need the a 'profile=' query param to be present!`
         return
+    }
+
+    let serverUrl = params.get("serverUrl")
+
+    if (serverUrl == null) {
+        serverUrl = "http://localhost:5000/"
+    }
+
+    if (!serverUrl.startsWith("http")) {
+        serverUrl = `https://${serverUrl}`
+    }
+
+    if (!serverUrl.endsWith("/")) {
+        serverUrl = `${serverUrl}/`
     }
 
     let initialState = EditorState.create({
@@ -39,10 +56,9 @@ async function main(): Promise<void> {
         state: initialState,
     })
 
-    let url = `http://localhost:5000/profile/${resource}/events`
     let textDecoder = new TextDecoder("utf-8")
 
-    await pipeable(fetch_chunked_transfer(url))
+    await pipeable(fetch_chunked_transfer(`${serverUrl}profile/${resource}/events`))
         .pipe(iter => mapAsyncIterable(bytes => textDecoder.decode(bytes), iter))
         .pipe(iter => mapAsyncIterable(str => str.split("\n"), iter))
         .pipe(iter => mapAsyncIterable(strs => {
