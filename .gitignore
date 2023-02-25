@@ -6,4 +6,3 @@ geckodriver.log
 # for frontend
 node_modules/
 .parcel-cache/
-dist/
