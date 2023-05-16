@@ -88,7 +88,12 @@ def get_webdriver() -> WebDriver:
         driver = util.lazy_chrome_web_driver(desired_capabilities=cap)
         return driver
 
-    return util.lazy_chrome_web_driver()
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless")
+    return util.lazy_chrome_web_driver(options=chrome_options)
 
 
 if __name__ == "__main__":
